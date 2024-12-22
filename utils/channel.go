@@ -6,6 +6,7 @@ import (
 	"github.com/go-telegram/bot"
 )
 
+// В одной функции можно использовать это
 func GetChannelLink(ctx context.Context, b *bot.Bot, targetChannelID string) (string, error) {
 	chat, err := b.GetChat(ctx, &bot.GetChatParams{
 		ChatID: targetChannelID,

@@ -9,7 +9,9 @@ import (
 	"github.com/go-telegram/bot/models"
 )
 
+// Handler должен отвечать только за логику взаимодействия с callback
 func CallbackHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
+	// Config should be passed throw function arguments
 	config, err := utils.LoadConfig("config/config.yaml")
 	if err != nil {
 		log.Printf("Ошибка загрузки конфигурации: %v", err)

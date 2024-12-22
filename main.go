@@ -4,7 +4,6 @@ import (
 	"TG_Bot2/handlers"
 	"TG_Bot2/utils"
 	"context"
-	"fmt"
 	"github.com/go-telegram/bot"
 	"log"
 	"os"
@@ -26,7 +25,6 @@ func main() {
 	}
 
 	b, err := bot.New(config.Bot.Token, opts...)
-	fmt.Println(config.Bot.Token)
 	if err != nil {
 		log.Fatalf("Ошибка создания бота: %v", err)
 	}
