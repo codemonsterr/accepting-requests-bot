@@ -1,0 +1,5 @@
+bot:
+  token: "7615844885:AAEhH51VbgspcaKffbFH4-n86Z7qTnEDgQs"
+channels:
+  target_channel_id: "-1002283665819"
+  join_request_chat_id: "-1002469373034"
