@@ -10,7 +10,8 @@ import (
 )
 
 func CallbackHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
-	// Config should be passed throw function arguments
+	// Стоит добавить проверку update.CallbackQuery на nil
+	// Конфиг нужно инициализироваться один раз и передаваться в аргументах функции, чтобы избежать дублирование кода
 	config, err := utils.LoadConfig("config/config.yaml")
 	if err != nil {
 		log.Printf("Ошибка загрузки конфигурации: %v", err)
@@ -18,7 +19,9 @@ func CallbackHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	}
 
 	callbackQueryID := update.CallbackQuery.ID
+	// Возможно стоит поменять на switch конструкцию
 	if update.CallbackQuery.Data == "check_subscription" {
+		// Вынести тело условия в отдельную функцию для более удобной читаемости
 		userID := update.CallbackQuery.From.ID
 
 		isSubscribed, err := utils.CheckSubscription(ctx, b, config.Channels.TargetChannelID, userID)
@@ -32,6 +35,15 @@ func CallbackHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 			messageText = "Вы подписаны на канал! 🎉 Ваша заявка будет одобрена."
 
 			// Одобрение заявки автоматически
+			/*Стоит вынести approveJoinRequest, answerCallbackQuery, sendMessage, sendErrorMessage и вынести в отдельный файл эти функции, чтобы уменьшить код и улучшить читаемость
+			Пример функции
+
+			func sendErrorMessage(ctx context.Context, b *bot.Bot, chatID int64, text string) {
+				err := sendMessage(ctx, b, chatID, text)
+				if err != nil {
+					log.Printf("Ошибка отправки сообщения об ошибке пользователю %d: %v", chatID, err)
+				}
+			}*/
 			_, approveErr := b.ApproveChatJoinRequest(ctx, &bot.ApproveChatJoinRequestParams{
 				ChatID: config.Channels.JoinRequestChatID,
 				UserID: userID,
@@ -51,7 +63,6 @@ func CallbackHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 			log.Printf("Ошибка подтверждения callback-запроса: %v", err)
 		}
 
-		// Уведомляем пользователя
 		_, err = b.SendMessage(ctx, &bot.SendMessageParams{
 			ChatID: userID,
 			Text:   messageText,
@@ -59,7 +70,5 @@ func CallbackHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 		if err != nil {
 			log.Printf("Ошибка отправки сообщения: %v", err)
 		}
-
 	}
-
 }

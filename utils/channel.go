@@ -17,5 +17,5 @@ func GetChannelLink(ctx context.Context, b *bot.Bot, targetChannelID string) (st
 	if chat.Username != "" {
 		return "https://t.me/" + chat.Username, nil
 	}
-	return "", fmt.Errorf("у канала нет публичного имени (это приватный канал)")
+	return "", fmt.Errorf("у канала нет публичного имени (это приватный канал)") // стоит немного отформатировать строки ошибок (необязательно)
 }

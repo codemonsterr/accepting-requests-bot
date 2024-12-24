@@ -7,7 +7,7 @@ import (
 	"github.com/go-telegram/bot"
 )
 
-const (
+const ( // Отлично
 	Member        = "member"
 	Administrator = "administrator"
 	Creator       = "creator"

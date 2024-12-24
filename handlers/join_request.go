@@ -9,17 +9,20 @@ import (
 	"github.com/go-telegram/bot/models"
 )
 
-func JoinRequestHandler(ctx context.Context, b *bot.Bot, request *models.ChatJoinRequest, config *utils.Config) {
+func JoinRequestHandler(ctx context.Context, b *bot.Bot, request *models.ChatJoinRequest, config *utils.Config /*Молодец, также в других надо делать*/) {
+	// Стоит добавить проверку request и также request.Chat и request.From
 	chatID := request.Chat.ID
 	userID := request.From.ID
 
 	isSubscribed, err := utils.CheckSubscription(ctx, b, config.Channels.TargetChannelID, userID)
 	if err != nil {
 		log.Printf("Ошибка проверки подписки: %v", err)
+		// Стоит использовать sendErrorMessage описанную в другом файле
 		return
 	}
 
 	if isSubscribed {
+		// Также вынести функции в отдельный файл
 		_, err := b.ApproveChatJoinRequest(ctx, &bot.ApproveChatJoinRequestParams{
 			ChatID: chatID,
 			UserID: userID,

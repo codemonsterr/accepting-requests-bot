@@ -16,6 +16,7 @@ type Config struct {
 	} `yaml:"channels"`
 }
 
+// Можешь начать писать юнит тесты на это и на все остальное
 func LoadConfig(path string) (*Config, error) {
 	file, err := os.Open(path)
 	if err != nil {

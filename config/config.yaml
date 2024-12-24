@@ -5,7 +5,7 @@ channels:
   join_request_chat_id: "-1002469373034"
 
 # Стоит сделать логичскую структуру в yaml файле по примеру и поменять config.go чтобы он считывал ее правильно
-
+# Стоит отредактировать все таки
 #telegram:
 #  bot:
 #    token: "7615844885:AAEhH51VbgspcaKffbFH4-n86Z7qTnEDgQs"
