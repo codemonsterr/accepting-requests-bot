@@ -11,7 +11,7 @@ import (
 
 func CallbackHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	// Стоит добавить проверку update.CallbackQuery на nil
-	// Конфиг нужно инициализироваться один раз и передаваться в аргументах функции, чтобы избежать дублирование кода
+	// Конфиг нужно инициализироваться один раз и передаваться в аргументах функции, чтобы избежать дублирование кода, и лучше переписать конфиг с этой библиотекой https://github.com/caarlos0/env
 	config, err := utils.LoadConfig("config/config.yaml")
 	if err != nil {
 		log.Printf("Ошибка загрузки конфигурации: %v", err)

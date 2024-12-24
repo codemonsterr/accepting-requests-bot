@@ -12,6 +12,8 @@ import (
 Интерфейсы стоит вынести вот так и передавать их в тайпе
 type JoinRequestHandlerFunc func(ctx context.Context, b *bot.Bot, update *models.ChatJoinRequest, config *utils.Config)
 */
+
+// Также стоит потом сделать структуру бот свою у которой будет методы
 type UpdateHandler struct {
 	JoinRequestHandler   func(ctx context.Context, b *bot.Bot, update *models.ChatJoinRequest, config *utils.Config)
 	CallbackQueryHandler func(ctx context.Context, b *bot.Bot, update *models.Update) // Тут тоже нужно передавать конфиг
