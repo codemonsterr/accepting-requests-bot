@@ -9,7 +9,6 @@ import (
 	"github.com/go-telegram/bot/models"
 )
 
-// Handler должен отвечать только за логику взаимодействия с callback
 func CallbackHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 	// Config should be passed throw function arguments
 	config, err := utils.LoadConfig("config/config.yaml")
@@ -25,11 +24,6 @@ func CallbackHandler(ctx context.Context, b *bot.Bot, update *models.Update) {
 		isSubscribed, err := utils.CheckSubscription(ctx, b, config.Channels.TargetChannelID, userID)
 		if err != nil {
 			log.Printf("Ошибка проверки подписки: %v", err)
-			b.AnswerCallbackQuery(ctx, &bot.AnswerCallbackQueryParams{
-				CallbackQueryID: callbackQueryID,
-				Text:            "Произошла ошибка при проверке подписки. Попробуйте позже.",
-				ShowAlert:       true,
-			})
 			return
 		}
 

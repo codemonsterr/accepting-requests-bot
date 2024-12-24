@@ -9,19 +9,10 @@ import (
 	"github.com/go-telegram/bot/models"
 )
 
-// Handler должен отвечать только за логику взаимодействия с реквестом
-func JoinRequestHandler(ctx context.Context, b *bot.Bot, request *models.ChatJoinRequest) {
-	// конфиг нужно передавать в аргументах функции
-	config, err := utils.LoadConfig("config/config.yaml")
-	if err != nil {
-		log.Printf("Ошибка загрузки конфигурации: %v", err)
-		return
-	}
-
+func JoinRequestHandler(ctx context.Context, b *bot.Bot, request *models.ChatJoinRequest, config *utils.Config) {
 	chatID := request.Chat.ID
 	userID := request.From.ID
 
-	// одинаковые ошибки должны одинаково обрабатываться
 	isSubscribed, err := utils.CheckSubscription(ctx, b, config.Channels.TargetChannelID, userID)
 	if err != nil {
 		log.Printf("Ошибка проверки подписки: %v", err)
@@ -39,30 +30,33 @@ func JoinRequestHandler(ctx context.Context, b *bot.Bot, request *models.ChatJoi
 			log.Printf("Заявка успешно одобрена %d", userID)
 		}
 	} else {
-		// получение ссылки следует вынести в отдельную функцию
-		channelLink, _ := utils.GetChannelLink(ctx, b, config.Channels.TargetChannelID)
-		_, sendErr := b.SendMessage(ctx, &bot.SendMessageParams{
-			ChatID: userID,
-			Text:   "Чтобы ваша заявка была одобрена, подпишитесь на наш канал!",
-			ReplyMarkup: &models.InlineKeyboardMarkup{
-				InlineKeyboard: [][]models.InlineKeyboardButton{
+		sendCheckButton(ctx, b, *config, userID)
+	}
+}
+
+func sendCheckButton(ctx context.Context, b *bot.Bot, config utils.Config, userID int64) {
+	channelLink, _ := utils.GetChannelLink(ctx, b, config.Channels.TargetChannelID)
+	_, sendErr := b.SendMessage(ctx, &bot.SendMessageParams{
+		ChatID: userID,
+		Text:   "Чтобы ваша заявка была одобрена, подпишитесь на наш канал!",
+		ReplyMarkup: &models.InlineKeyboardMarkup{
+			InlineKeyboard: [][]models.InlineKeyboardButton{
+				{
 					{
-						{
-							Text: "Перейти на канал",
-							URL:  channelLink,
-						},
+						Text: "Перейти на канал",
+						URL:  channelLink,
 					},
+				},
+				{
 					{
-						{
-							Text:         "Проверить подписку",
-							CallbackData: "check_subscription",
-						},
+						Text:         "Проверить подписку",
+						CallbackData: "check_subscription",
 					},
 				},
 			},
-		})
-		if sendErr != nil {
-			log.Printf("Ошибка отправки сообщения: %v", sendErr)
-		}
+		},
+	})
+	if sendErr != nil {
+		log.Printf("Ошибка отправки сообщения: %v", sendErr)
 	}
 }
