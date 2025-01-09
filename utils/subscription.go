@@ -32,3 +32,5 @@ func CheckSubscription(ctx context.Context, b *bot.Bot, targetChannelID string, 
 		return false, nil
 	}
 }
+
+

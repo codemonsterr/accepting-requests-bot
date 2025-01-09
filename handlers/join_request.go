@@ -9,36 +9,45 @@ import (
 	"github.com/go-telegram/bot/models"
 )
 
-func JoinRequestHandler(ctx context.Context, b *bot.Bot, request *models.ChatJoinRequest, config *utils.Config /*Молодец, также в других надо делать*/) {
-	// Стоит добавить проверку request и также request.Chat и request.From
-	chatID := request.Chat.ID
-	userID := request.From.ID
+// Обработчик заявки на вступление в чат
+func JoinRequestHandler(ctx context.Context, b *bot.Bot, request *models.ChatJoinRequest, config *utils.Config) {
 
-	isSubscribed, err := utils.CheckSubscription(ctx, b, config.Channels.TargetChannelID, userID)
-	if err != nil {
-		log.Printf("Ошибка проверки подписки: %v", err)
-		// Стоит использовать sendErrorMessage описанную в другом файле
+	if request.Chat.ID == 0 || request.From.ID == 0 {
+		// Обработка ошибки, если ID равен 0
+		sendErrorMessage(ctx, b, request.From.ID, "Ошибка: request.Chat.ID или request.From.ID равны 0.")
 		return
 	}
 
+	chatID := request.Chat.ID
+	userID := request.From.ID
+
+	// Проверка подписки
+	isSubscribed, err := utils.CheckSubscription(ctx, b, config.Telegram.Channels.TargetChannelID, userID)
+	if err != nil {
+		log.Printf("Ошибка проверки подписки: %v", err)
+		sendErrorMessage(ctx, b, userID, "Произошла ошибка при проверке подписки.")
+		return
+	}
+
+	// Обработка заявки в зависимости от подписки
 	if isSubscribed {
-		// Также вынести функции в отдельный файл
-		_, err := b.ApproveChatJoinRequest(ctx, &bot.ApproveChatJoinRequestParams{
-			ChatID: chatID,
-			UserID: userID,
-		})
-		if err != nil {
-			log.Printf("Ошибка при одобрении заявки пользователя %d: %v", userID, err)
-		} else {
-			log.Printf("Заявка успешно одобрена %d", userID)
-		}
+		ApproveJoinRequest(ctx, b, chatID, userID)
 	} else {
 		sendCheckButton(ctx, b, *config, userID)
 	}
 }
 
+// Функция для отправки кнопки с проверкой подписки
 func sendCheckButton(ctx context.Context, b *bot.Bot, config utils.Config, userID int64) {
-	channelLink, _ := utils.GetChannelLink(ctx, b, config.Channels.TargetChannelID)
+	// Получаем ссылку на канал
+	channelLink, err := utils.GetChannelLink(ctx, b, config.Telegram.Channels.TargetChannelID)
+	if err != nil {
+		log.Printf("Ошибка получения ссылки на канал: %v", err)
+		sendErrorMessage(ctx, b, userID, "Ошибка получения ссылки на канал.")
+		return
+	}
+
+	// Отправляем сообщение с кнопками
 	_, sendErr := b.SendMessage(ctx, &bot.SendMessageParams{
 		ChatID: userID,
 		Text:   "Чтобы ваша заявка была одобрена, подпишитесь на наш канал!",

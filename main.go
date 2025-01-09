@@ -13,13 +13,16 @@ import (
 
 func main() {
 	// Загрузка конфигурации
+
 	config, err := utils.LoadConfig("config/config.yaml")
 	if err != nil {
 		log.Fatalf("Ошибка загрузки конфигурации: %v", err)
 	}
 
+	log.Printf("Загруженная конфигурация: %+v", config)
+
 	// Создание экземпляра обработчика обновлений
-	updateHandler := handlers.NewUpdateHandler(config)
+	updateHandler := handlers.NewUpdateHandler()
 
 	// Создаём контекст с поддержкой завершения через сигнал
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
@@ -33,7 +36,7 @@ func main() {
 	}
 
 	// Создаём экземпляр бота
-	b, err := bot.New(config.Bot.Token, opts...)
+	b, err := bot.New(config.Telegram.Bot.Token, opts...)
 	if err != nil {
 		log.Fatalf("Ошибка создания бота: %v", err)
 	}
